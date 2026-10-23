@@ -1,7 +1,7 @@
 #!/bin/sh
-REPO=fredblgr/
+REPO=start974/
 IMAGE=framac
-TAG=2021
+TAG=33.0
 
 if [ -z "$SUDO_UID" ]
 then
@@ -14,22 +14,13 @@ else
   USER_NAME=${SUDO_USER}
 fi
 
-if [ "`uname`" = "Darwin" ]
-then
-  open -a XQuartz
-fi
-
-if [ -z "$SUDO_UID" ]
-then
-  xhost +localhost
-else
-  su ${USER_NAME} -c 'xhost +localhost'
-fi
-
+# The GUIs are displayed in a web browser through noVNC:
+# http://localhost:6080/vnc.html?autoconnect=1&resize=remote
 docker run --rm --tty --interactive \
   --volume ${PWD}:/workspace:rw \
   --env USERNAME=${USER_NAME} --env USERID=${USER_ID} \
-  --env DISPLAY="host.docker.internal:0" \
+  --publish 127.0.0.1:6080:6080 \
+  --shm-size 1g \
   --workdir /workspace \
   --name ${IMAGE} \
   ${REPO}${IMAGE}:${TAG}

@@ -1,8 +1,13 @@
 Frama-C with MetAcsl, Why3 and a selection of SMT solvers in a multi architecture (amd64 and arm64) image.
 
-Available on dockerhub: [https://hub.docker.com/r/fredblgr/framac](https://hub.docker.com/r/fredblgr/framac)
+Available on dockerhub: [https://hub.docker.com/r/start974/framac](https://hub.docker.com/r/start974/framac)
 
-Source files available on GitHub: [https://github.com/Frederic-Boulanger-UPS/docker-framac](https://github.com/Frederic-Boulanger-UPS/docker-framac)
+Source files available on GitHub: [https://github.com/start974/docker-framac](https://github.com/start974/docker-framac)
+
+This image is directly inspired by the original
+[docker-framac](https://github.com/Frederic-Boulanger-UPS/docker-framac) by Frédéric Boulanger
+(image [fredblgr/framac](https://hub.docker.com/r/fredblgr/framac) on Docker Hub),
+updated to Frama-C 33 with Ivette and a desktop available from a web browser through noVNC.
 
 How to use it
 --
@@ -11,9 +16,9 @@ Then start the container, mounting the current working directory on /workspace i
 ```
 docker run --rm --tty --interactive \
            --volume "$(PWD):/workspace:rw" \
-           --name framac2021 \
+           --name framac33 \
            --env="DISPLAY=host.docker.internal:0" \
-           fredblgr/framac-${platform}:2021
+           start974/framac:33.0
 ```
 
 **Note**: on Apple M1 machines, the setting of the X11 display in Docker does not seem to work yet.
@@ -23,7 +28,7 @@ It is easier to use the scripts available on [GitHub](https://github.com/Frederi
 
 In a terminal, run `make run` or `./run-docker-framac.sh`. On Windows, you can use `run-docker-framac.ps1` with PowerShell.
 After pulling the image from dockerhub, you should be logged as root in the container.
-You can then use `z3`, `cvc4`, `alt-ergo`, `eprover`, `why3`, `frama-c`and `frama-c-gui`.
+You can then use `z3`, `cvc5`, `alt-ergo`, `why3`, `frama-c` and `frama-c-gui` (Ivette, the new GUI of Frama-C).
 
 The current working directory is mounted as `/workspace` in the container.
 
@@ -35,13 +40,14 @@ On Windows 10, you can use [VcXsrv](https://sourceforge.net/projects/vcxsrv/).
 
 Contents of the image
 --
-This image, based on ubuntu:20.04, contains:
-* alt-ergo 2.0.0
-* Z3 4.8.6
-* E prover 2.0
-* CVC4 1.7
-* Why3 1.3.3
-* Frama-C 22.0 with MetAcsl 0.1
+This image, based on ubuntu:24.04, contains:
+* Alt-Ergo 2.6.4
+* Z3 4.13.4
+* CVC5 1.2.1
+* Why3 1.8.2 (with `why3 ide`)
+* Frama-C 33.0 (Arsenic) with MetAcsl 0.11
+* Ivette, the Electron-based GUI of Frama-C, available as `frama-c-gui`
+  (it replaces the former GTK GUI)
 
 Contents of the repository
 --

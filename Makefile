@@ -1,8 +1,8 @@
 .PHONY: build manifest buildfat check run debug push save clean clobber
 
-REPO    = fredblgr/
+REPO    = start974/
 NAME    = framac
-TAG     = 2021
+TAG     = 33.0
 ARCH   := $$(arch=$$(uname -m); if [[ $$arch == "x86_64" ]]; then echo amd64; else echo $$arch; fi)
 
 ARCHS   = amd64 arm64
@@ -13,16 +13,13 @@ help:
 	@echo "# Available targets:"
 	@echo "#   - build: build docker image"
 	@echo "#   - clean: clean docker build cache"
-	@echo "#   - run: run docker container"
+	@echo "#   - run: run docker container, GUIs at http://localhost:6080/vnc.html"
 	@echo "#   - push: push docker image to docker hub"
 
 # Build image
 build:
 	docker build --tag $(REPO)$(NAME):$(TAG)-$(ARCH) .
-	@danglingimages=$$(docker images --filter "dangling=true" -q); \
-	if [[ $$danglingimages != "" ]]; then \
-	  docker rmi $$(docker images --filter "dangling=true" -q); \
-	fi
+	@docker image prune --force > /dev/null
 
 # Safe way to build multiarchitecture images:
 # - build each image on the matching hardware, with the -$(ARCH) tag
@@ -54,10 +51,7 @@ buildfat:
 	docker buildx build --push \
 	  --platform $(PLATFORMS) \
 	  --tag $(REPO)$(NAME):$(TAG) .
-	@danglingimages=$$(docker images --filter "dangling=true" -q); \
-	if [[ $$danglingimages != "" ]]; then \
-	  docker rmi $$(docker images --filter "dangling=true" -q); \
-	fi
+	@docker image prune --force > /dev/null
 
 push:
 	docker push $(REPO)$(NAME):$(TAG)-$(ARCH)
@@ -79,7 +73,8 @@ run:
 		--volume "${PWD}":/workspace:rw \
 		--workdir /workspace \
 		--name $(NAME) \
-		--env DISPLAY="host.docker.internal:0" \
+		--publish 127.0.0.1:6080:6080 \
+		--shm-size 1g \
 		$(REPO)$(NAME):$(TAG)-$(ARCH)
 
 runasroot:
@@ -87,6 +82,7 @@ runasroot:
 		--volume "${PWD}":/workspace:rw \
 		--workdir /workspace \
 		--name $(NAME) \
-		--env DISPLAY="host.docker.internal:0" \
+		--publish 127.0.0.1:6080:6080 \
+		--shm-size 1g \
 		--user 0 \
 		$(REPO)$(NAME):$(TAG)-$(ARCH)

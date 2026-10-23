@@ -1,12 +1,8 @@
 # Has to be authorized using:
 # Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-$REPO="fredblgr/"
+$REPO="start974/"
 $IMAGE="framac"
-$TAG="2021"
-$env:DISPLAY = "localhost:0"
-if (Get-Process vcxsrv -ErrorAction SilentlyContinue) {
-} else {
-  $env:Path += ";C:\Program Files\VcXsrv"
-  vcxsrv :0 -multiwindow
-}
-docker run --rm --tty --interactive --volume "${PWD}:/workspace:rw" --workdir /workspace --env "DISPLAY=host.docker.internal:0" --name "${IMAGE}" "${REPO}${IMAGE}:${TAG}"
+$TAG="33.0"
+# The GUIs are displayed in a web browser through noVNC:
+# http://localhost:6080/vnc.html?autoconnect=1&resize=remote
+docker run --rm --tty --interactive --volume "${PWD}:/workspace:rw" --workdir /workspace --publish 127.0.0.1:6080:6080 --shm-size 1g --name "${IMAGE}" "${REPO}${IMAGE}:${TAG}"
